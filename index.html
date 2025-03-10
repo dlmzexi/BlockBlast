@@ -3,137 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluffy Bird Game</title>
+    <title>Block Blast</title>
     <style>
         body {
             text-align: center;
+            background-color: #222;
+            color: white;
             font-family: Arial, sans-serif;
-            background-color: skyblue;
         }
         canvas {
-            border: 2px solid black;
-            background-color: lightblue;
-            display: none;
-        }
-        #startButton {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: green;
-            color: white;
-            border: none;
-            cursor: pointer;
+            background: #000;
+            display: block;
+            margin: auto;
         }
     </style>
 </head>
 <body>
-    <h1>Fluffy Bird Game</h1>
-    <button id="startButton">Start Game</button>
-    <canvas id="gameCanvas" width="320" height="480"></canvas>
+    <h1>Block Blast</h1>
+    <canvas id="gameCanvas" width="480" height="320"></canvas>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        const startButton = document.getElementById("startButton");
-        
-        let bird, pipes, frame, score, gameRunning;
-        
-        function initializeGame() {
-            bird = {
-                x: 50,
-                y: 150,
-                radius: 15,
-                gravity: 0.6,
-                lift: -10,
-                velocity: 0
-            };
-            pipes = [];
-            frame = 0;
-            score = 0;
-            gameRunning = true;
-            gameLoop();
+
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height - 30;
+        let ballDX = 2;
+        let ballDY = -2;
+        let ballRadius = 10;
+
+        let paddleHeight = 10;
+        let paddleWidth = 75;
+        let paddleX = (canvas.width - paddleWidth) / 2;
+        let rightPressed = false;
+        let leftPressed = false;
+
+        let brickRowCount = 3;
+        let brickColumnCount = 5;
+        let brickWidth = 75;
+        let brickHeight = 20;
+        let brickPadding = 10;
+        let brickOffsetTop = 30;
+        let brickOffsetLeft = 30;
+
+        let bricks = [];
+        for(let c = 0; c < brickColumnCount; c++) {
+            bricks[c] = [];
+            for(let r = 0; r < brickRowCount; r++) {
+                bricks[c][r] = { x: 0, y: 0, status: 1 };
+            }
         }
-        
-        function drawBird() {
-            ctx.fillStyle = "yellow";
+
+        document.addEventListener("keydown", keyDownHandler);
+        document.addEventListener("keyup", keyUpHandler);
+
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = true;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = false;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+        function drawBall() {
             ctx.beginPath();
-            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#FF5733";
             ctx.fill();
+            ctx.closePath();
         }
-        
-        function drawPipes() {
-            ctx.fillStyle = "green";
-            pipes.forEach(pipe => {
-                ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
-                ctx.fillRect(pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
-            });
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
         }
-        
-        function updateBird() {
-            bird.velocity += bird.gravity;
-            bird.y += bird.velocity;
-            if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) {
-                gameRunning = false;
-            }
-        }
-        
-        function updatePipes() {
-            if (frame % 90 === 0) {
-                let gap = 120;
-                let top = Math.random() * (canvas.height / 2);
-                pipes.push({ x: canvas.width, width: 40, top: top, bottom: top + gap });
-            }
-            pipes.forEach(pipe => {
-                pipe.x -= 2;
-                if (pipe.x + pipe.width < 0) {
-                    pipes.shift();
-                    score++;
+
+        function drawBricks() {
+            for(let c = 0; c < brickColumnCount; c++) {
+                for(let r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status === 1) {
+                        let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                        let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                        bricks[c][r].x = brickX;
+                        bricks[c][r].y = brickY;
+                        ctx.beginPath();
+                        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                        ctx.fillStyle = "#FFD700";
+                        ctx.fill();
+                        ctx.closePath();
+                    }
                 }
-                if (
-                    bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + pipe.width &&
-                    (bird.y - bird.radius < pipe.top || bird.y + bird.radius > pipe.bottom)
-                ) {
-                    gameRunning = false;
-                }
-            });
-        }
-        
-        function drawScore() {
-            ctx.fillStyle = "black";
-            ctx.font = "20px Arial";
-            ctx.fillText("Score: " + score, 10, 30);
-        }
-        
-        function gameLoop() {
-            if (!gameRunning) {
-                alert("Game Over! Score: " + score);
-                startButton.style.display = "block";
-                canvas.style.display = "none";
-                return;
             }
+        }
+
+        function collisionDetection() {
+            for(let c = 0; c < brickColumnCount; c++) {
+                for(let r = 0; r < brickRowCount; r++) {
+                    let b = bricks[c][r];
+                    if (b.status === 1) {
+                        if (ballX > b.x && ballX < b.x + brickWidth && ballY > b.y && ballY < b.y + brickHeight) {
+                            ballDY = -ballDY;
+                            b.status = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBird();
-            drawPipes();
-            drawScore();
-            updateBird();
-            updatePipes();
-            frame++;
-            requestAnimationFrame(gameLoop);
-        }
-        
-        function startGame() {
-            startButton.style.display = "none";
-            canvas.style.display = "block";
-            initializeGame();
-        }
-        
-        function jump() {
-            if (gameRunning) {
-                bird.velocity = bird.lift;
+            drawBricks();
+            drawBall();
+            drawPaddle();
+            collisionDetection();
+
+            if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
+                ballDX = -ballDX;
             }
+            if (ballY + ballDY < ballRadius) {
+                ballDY = -ballDY;
+            } else if (ballY + ballDY > canvas.height - ballRadius) {
+                if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+                    ballDY = -ballDY;
+                } else {
+                    document.location.reload();
+                }
+            }
+
+            if (rightPressed && paddleX < canvas.width - paddleWidth) {
+                paddleX += 5;
+            } else if (leftPressed && paddleX > 0) {
+                paddleX -= 5;
+            }
+
+            ballX += ballDX;
+            ballY += ballDY;
+            requestAnimationFrame(draw);
         }
-        
-        document.addEventListener("keydown", jump);
-        document.addEventListener("click", jump);
-        startButton.addEventListener("click", startGame);
+
+        draw();
     </script>
 </body>
 </html>
