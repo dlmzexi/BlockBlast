@@ -34,19 +34,23 @@
         const ctx = canvas.getContext("2d");
         const startButton = document.getElementById("startButton");
         
-        let bird = {
-            x: 50,
-            y: 150,
-            radius: 15,
-            gravity: 0.6,
-            lift: -10,
-            velocity: 0
-        };
+        let bird, pipes, frame, score, gameRunning;
         
-        let pipes = [];
-        let frame = 0;
-        let score = 0;
-        let gameRunning = false;
+        function initializeGame() {
+            bird = {
+                x: 50,
+                y: 150,
+                radius: 15,
+                gravity: 0.6,
+                lift: -10,
+                velocity: 0
+            };
+            pipes = [];
+            frame = 0;
+            score = 0;
+            gameRunning = true;
+            gameLoop();
+        }
         
         function drawBird() {
             ctx.fillStyle = "yellow";
@@ -101,7 +105,35 @@
         function gameLoop() {
             if (!gameRunning) {
                 alert("Game Over! Score: " + score);
-                document.location.reload();
+                startButton.style.display = "block";
+                canvas.style.display = "none";
                 return;
             }
-            ctx.clearRect(0, 0, canvas.width, canvas.hei
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBird();
+            drawPipes();
+            drawScore();
+            updateBird();
+            updatePipes();
+            frame++;
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function startGame() {
+            startButton.style.display = "none";
+            canvas.style.display = "block";
+            initializeGame();
+        }
+        
+        function jump() {
+            if (gameRunning) {
+                bird.velocity = bird.lift;
+            }
+        }
+        
+        document.addEventListener("keydown", jump);
+        document.addEventListener("click", jump);
+        startButton.addEventListener("click", startGame);
+    </script>
+</body>
+</html>
