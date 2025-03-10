@@ -62,7 +62,7 @@
         
         function updatePipes() {
             if (frame % 90 === 0) {
-                let gap = 100;
+                let gap = 120; // Increased the gap size for easier gameplay
                 let top = Math.random() * (canvas.height / 2);
                 pipes.push({ x: canvas.width, width: 40, top: top, bottom: top + gap });
             }
