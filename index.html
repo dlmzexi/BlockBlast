@@ -13,29 +13,40 @@
         canvas {
             border: 2px solid black;
             background-color: lightblue;
+            display: none;
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Fluffy Bird Game</h1>
+    <button id="startButton">Start Game</button>
     <canvas id="gameCanvas" width="320" height="480"></canvas>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const startButton = document.getElementById("startButton");
         
         let bird = {
             x: 50,
             y: 150,
             radius: 15,
-            gravity: 0.4, // Reduced gravity for a slower fall
-            lift: -12, // Stronger lift to make jumps easier
+            gravity: 0.6,
+            lift: -10,
             velocity: 0
         };
         
         let pipes = [];
         let frame = 0;
         let score = 0;
-        let gameRunning = true;
+        let gameRunning = false;
         
         function drawBird() {
             ctx.fillStyle = "yellow";
@@ -61,13 +72,13 @@
         }
         
         function updatePipes() {
-            if (frame % 100 === 0) { // Slower pipe generation
-                let gap = 150; // Increased the gap size for easier gameplay
+            if (frame % 90 === 0) {
+                let gap = 120;
                 let top = Math.random() * (canvas.height / 2);
                 pipes.push({ x: canvas.width, width: 40, top: top, bottom: top + gap });
             }
             pipes.forEach(pipe => {
-                pipe.x -= 1.5; // Slower pipe movement to make the game easier
+                pipe.x -= 2;
                 if (pipe.x + pipe.width < 0) {
                     pipes.shift();
                     score++;
@@ -93,24 +104,4 @@
                 document.location.reload();
                 return;
             }
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBird();
-            drawPipes();
-            drawScore();
-            updateBird();
-            updatePipes();
-            frame++;
-            requestAnimationFrame(gameLoop);
-        }
-        
-        function jump() {
-            bird.velocity = bird.lift;
-        }
-        
-        document.addEventListener("keydown", jump);
-        document.addEventListener("click", jump);
-        
-        gameLoop();
-    </script>
-</body>
-</html>
+            ctx.clearRect(0, 0, canvas.width, canvas.hei
