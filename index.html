@@ -103,11 +103,15 @@
             requestAnimationFrame(gameLoop);
         }
         
-        document.addEventListener("keydown", () => {
+        function jump() {
             bird.velocity = bird.lift;
-        });
+        }
+        
+        document.addEventListener("keydown", jump);
+        document.addEventListener("click", jump);
         
         gameLoop();
     </script>
 </body>
 </html>
+
