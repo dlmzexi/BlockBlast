@@ -163,16 +163,12 @@
             requestAnimationFrame(draw);
         }
 
-        function movePaddle(event) {
-            const rect = canvas.getBoundingClientRect();
-            let mouseX = event.touches ? event.touches[0].clientX : event.clientX;
-            paddleX = mouseX - rect.left - paddleWidth / 2;
-            if (paddleX < 0) paddleX = 0;
-            if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
-        }
-
-        document.addEventListener("mousemove", movePaddle);
-        document.addEventListener("touchmove", movePaddle, { passive: true });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowRight") paddleX += 20;
+            if (event.key === "ArrowLeft") paddleX -= 20;
+        });
+        document.addEventListener("mousemove", (event) => paddleX = event.clientX - canvas.offsetLeft - paddleWidth / 2);
+        document.addEventListener("touchmove", (event) => paddleX = event.touches[0].clientX - canvas.offsetLeft - paddleWidth / 2, { passive: true });
     </script>
 </body>
 </html>
