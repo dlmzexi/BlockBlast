@@ -92,7 +92,9 @@
             for(let c = 0; c < brickColumnCount; c++) {
                 bricks[c] = [];
                 for(let r = 0; r < brickRowCount; r++) {
-                    bricks[c][r] = { x: 0, y: 0, status: 1 };
+                    let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                    let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                    bricks[c][r] = { x: brickX, y: brickY, status: 1 };
                 }
             }
         }
@@ -103,39 +105,28 @@
             initializeGame();
         }
 
-        document.addEventListener("keydown", keyDownHandler);
-        document.addEventListener("keyup", keyUpHandler);
-        document.addEventListener("mousemove", mouseMoveHandler);
-        canvas.addEventListener("touchmove", touchMoveHandler);
-
-        function keyDownHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
-                rightPressed = true;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
-                leftPressed = true;
+        function drawBricks() {
+            for(let c = 0; c < brickColumnCount; c++) {
+                for(let r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status === 1) {
+                        ctx.fillStyle = "red";
+                        ctx.fillRect(bricks[c][r].x, bricks[c][r].y, brickWidth, brickHeight);
+                    }
+                }
             }
         }
 
-        function keyUpHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
-                rightPressed = false;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
-                leftPressed = false;
-            }
+        function drawPaddle() {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
         }
 
-        function mouseMoveHandler(e) {
-            let relativeX = e.clientX - canvas.offsetLeft;
-            paddleX = relativeX - paddleWidth / 2;
-            if (paddleX < 0) paddleX = 0;
-            if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
-        }
-
-        function touchMoveHandler(e) {
-            let touchX = e.touches[0].clientX - canvas.offsetLeft;
-            paddleX = touchX - paddleWidth / 2;
-            if (paddleX < 0) paddleX = 0;
-            if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();
         }
 
         function collisionDetection() {
@@ -182,6 +173,11 @@
             ballY += ballDY;
             requestAnimationFrame(draw);
         }
+
+        document.addEventListener("keydown", keyDownHandler);
+        document.addEventListener("keyup", keyUpHandler);
+        document.addEventListener("mousemove", mouseMoveHandler);
+        canvas.addEventListener("touchmove", touchMoveHandler);
     </script>
 </body>
 </html>
