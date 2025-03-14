@@ -60,7 +60,7 @@
         let ballX, ballY, ballDX, ballDY, ballRadius, paddleHeight, paddleWidth, paddleX;
         let rightPressed = false, leftPressed = false;
         let level = 1, maxLevels = 3, lives = 3;
-        let brickRowCount = 3, brickColumnCount = 5, brickWidth = 75, brickHeight = 20, brickPadding = 10, brickOffsetTop = 30, brickOffsetLeft = 30;
+        let brickRowCount, brickColumnCount = 5, brickWidth = 75, brickHeight = 20, brickPadding = 10, brickOffsetTop = 30, brickOffsetLeft = 30;
         let bricks = [];
 
         function initializeGame() {
@@ -72,6 +72,9 @@
             paddleHeight = 10;
             paddleWidth = 75;
             paddleX = (canvas.width - paddleWidth) / 2;
+
+            // Set the number of brick rows based on the level
+            brickRowCount = level + 1; // Level 1: 2 rows, Level 2: 3 rows, Level 3: 4 rows
             initializeBricks();
             draw();
         }
@@ -110,11 +113,7 @@
                     if (confirm("Level cleared! Proceed to the next level?")) {
                         level++;
                         levelDisplay.textContent = level;
-                        initializeBricks();
-                        ballX = canvas.width / 2;
-                        ballY = canvas.height - 30;
-                        ballDX = 2;
-                        ballDY = -2;
+                        initializeGame();
                     } else {
                         document.location.reload();
                     }
