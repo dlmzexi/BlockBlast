@@ -144,18 +144,22 @@
             }
             if (ballY + ballDY < ballRadius) {
                 ballDY = -ballDY;
-            } else if (ballY + ballDY > canvas.height - ballRadius) {
-                lives--;
-                livesDisplay.textContent = lives;
-                if (lives === 0) {
-                    alert("Game Over!");
-                    document.location.reload();
+            } else if (ballY + ballDY > canvas.height - paddleHeight - ballRadius) {
+                if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+                    ballDY = -ballDY;
                 } else {
-                    ballX = canvas.width / 2;
-                    ballY = canvas.height - 30;
-                    ballDX = 2;
-                    ballDY = -2;
-                    paddleX = (canvas.width - paddleWidth) / 2;
+                    lives--;
+                    livesDisplay.textContent = lives;
+                    if (lives === 0) {
+                        alert("Game Over!");
+                        document.location.reload();
+                    } else {
+                        ballX = canvas.width / 2;
+                        ballY = canvas.height - 30;
+                        ballDX = 2;
+                        ballDY = -2;
+                        paddleX = (canvas.width - paddleWidth) / 2;
+                    }
                 }
             }
             ballX += ballDX;
