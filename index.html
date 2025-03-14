@@ -36,6 +36,10 @@
             border: none;
             color: white;
             border-radius: 5px;
+            margin: 10px;
+        }
+        .exit-button {
+            background-color: #d9534f;
         }
     </style>
 </head>
@@ -43,6 +47,7 @@
     <div id="menu" class="menu">
         <h1>Block Blast</h1>
         <button onclick="startGame()">Start Game</button>
+        <button class="exit-button" onclick="exitGame()">Exit</button>
     </div>
     <div id="gameContainer" class="hidden">
         <h1>Block Blast</h1>
@@ -72,9 +77,7 @@
             paddleHeight = 10;
             paddleWidth = 75;
             paddleX = (canvas.width - paddleWidth) / 2;
-
-            // Set the number of brick rows based on the level
-            brickRowCount = level + 1; // Level 1: 2 rows, Level 2: 3 rows, Level 3: 4 rows
+            brickRowCount = level + 1;
             initializeBricks();
             draw();
         }
@@ -95,6 +98,14 @@
             menu.classList.add("hidden");
             gameContainer.classList.remove("hidden");
             initializeGame();
+        }
+
+        function exitGame() {
+            let confirmExit = confirm("Are you sure you want to exit?");
+            if (confirmExit) {
+                window.close();
+                alert("Your browser does not support closing via script. Please close manually.");
+            }
         }
 
         function drawBricks() {
@@ -217,3 +228,4 @@
     </script>
 </body>
 </html>
+
