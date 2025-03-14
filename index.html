@@ -58,8 +58,9 @@
         const livesDisplay = document.getElementById("lives");
 
         let ballX, ballY, ballDX, ballDY, ballRadius, paddleHeight, paddleWidth, paddleX;
-        let rightPressed, leftPressed, level, maxLevels, lives;
-        let brickRowCount, brickColumnCount, brickWidth, brickHeight, brickPadding, brickOffsetTop, brickOffsetLeft;
+        let rightPressed = false, leftPressed = false;
+        let level = 1, maxLevels = 3, lives = 3;
+        let brickRowCount = 3, brickColumnCount = 5, brickWidth = 75, brickHeight = 20, brickPadding = 10, brickOffsetTop = 30, brickOffsetLeft = 30;
         let bricks = [];
 
         function initializeGame() {
@@ -71,18 +72,6 @@
             paddleHeight = 10;
             paddleWidth = 75;
             paddleX = (canvas.width - paddleWidth) / 2;
-            rightPressed = false;
-            leftPressed = false;
-            level = 1;
-            maxLevels = 3;
-            lives = 3;
-            brickRowCount = 3;
-            brickColumnCount = 5;
-            brickWidth = 75;
-            brickHeight = 20;
-            brickPadding = 10;
-            brickOffsetTop = 30;
-            brickOffsetLeft = 30;
             initializeBricks();
             draw();
         }
@@ -174,10 +163,16 @@
             requestAnimationFrame(draw);
         }
 
-        document.addEventListener("keydown", keyDownHandler);
-        document.addEventListener("keyup", keyUpHandler);
-        document.addEventListener("mousemove", mouseMoveHandler);
-        canvas.addEventListener("touchmove", touchMoveHandler);
+        function movePaddle(event) {
+            const rect = canvas.getBoundingClientRect();
+            let mouseX = event.touches ? event.touches[0].clientX : event.clientX;
+            paddleX = mouseX - rect.left - paddleWidth / 2;
+            if (paddleX < 0) paddleX = 0;
+            if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+        }
+
+        document.addEventListener("mousemove", movePaddle);
+        document.addEventListener("touchmove", movePaddle, { passive: true });
     </script>
 </body>
 </html>
