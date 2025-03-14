@@ -107,13 +107,17 @@
             }
             if (allCleared) {
                 if (level < maxLevels) {
-                    level++;
-                    levelDisplay.textContent = level;
-                    initializeBricks();
-                    ballX = canvas.width / 2;
-                    ballY = canvas.height - 30;
-                    ballDX = 2;
-                    ballDY = -2;
+                    if (confirm("Level cleared! Proceed to the next level?")) {
+                        level++;
+                        levelDisplay.textContent = level;
+                        initializeBricks();
+                        ballX = canvas.width / 2;
+                        ballY = canvas.height - 30;
+                        ballDX = 2;
+                        ballDY = -2;
+                    } else {
+                        document.location.reload();
+                    }
                 } else {
                     alert("Congratulations! You cleared all levels!");
                     document.location.reload();
@@ -169,19 +173,48 @@
                     if (lives === 0) {
                         alert("Game Over!");
                         document.location.reload();
+                    } else {
+                        ballX = canvas.width / 2;
+                        ballY = canvas.height - 30;
+                        ballDX = 2;
+                        ballDY = -2;
                     }
                 }
             }
             ballX += ballDX;
             ballY += ballDY;
-            paddleX = Math.max(0, Math.min(canvas.width - paddleWidth, paddleX));
             requestAnimationFrame(draw);
         }
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowRight") paddleX = Math.min(canvas.width - paddleWidth, paddleX + 20);
-            if (event.key === "ArrowLeft") paddleX = Math.max(0, paddleX - 20);
+            if (event.key === "ArrowRight") rightPressed = true;
+            if (event.key === "ArrowLeft") leftPressed = true;
         });
+
+        document.addEventListener("keyup", (event) => {
+            if (event.key === "ArrowRight") rightPressed = false;
+            if (event.key === "ArrowLeft") leftPressed = false;
+        });
+
+        document.addEventListener("mousemove", (event) => {
+            let relativeX = event.clientX - canvas.offsetLeft;
+            if (relativeX > 0 && relativeX < canvas.width) {
+                paddleX = relativeX - paddleWidth / 2;
+            }
+        });
+
+        canvas.addEventListener("touchmove", (event) => {
+            let touchX = event.touches[0].clientX - canvas.offsetLeft;
+            paddleX = Math.max(0, Math.min(canvas.width - paddleWidth, touchX - paddleWidth / 2));
+        });
+
+        function updatePaddle() {
+            if (rightPressed) paddleX = Math.min(canvas.width - paddleWidth, paddleX + 5);
+            if (leftPressed) paddleX = Math.max(0, paddleX - 5);
+            requestAnimationFrame(updatePaddle);
+        }
+
+        updatePaddle();
     </script>
 </body>
 </html>
